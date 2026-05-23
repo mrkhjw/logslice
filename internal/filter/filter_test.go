@@ -93,3 +93,21 @@ func TestFilter_NoOptions(t *testing.T) {
 		t.Errorf("expected all %d entries, got %d", len(entries), len(got))
 	}
 }
+
+func TestFilter_EmptyEntries(t *testing.T) {
+	got := filter.Filter([]parser.Entry{}, filter.Options{Level: "ERROR"})
+	if len(got) != 0 {
+		t.Errorf("expected 0 entries for empty input, got %d", len(got))
+	}
+}
+
+func TestFilter_LevelCaseInsensitive(t *testing.T) {
+	entries := []parser.Entry{
+		makeEntry(parser.LevelInfo, t1, nil),
+		makeEntry(parser.LevelError, t2, nil),
+	}
+	got := filter.Filter(entries, filter.Options{Level: "error"})
+	if len(got) != 1 || got[0].Level != parser.LevelError {
+		t.Errorf("expected 1 ERROR entry with lowercase filter, got %d", len(got))
+	}
+}
