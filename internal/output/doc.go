@@ -2,6 +2,12 @@
 // to various output formats including plain text, JSON (newline-delimited),
 // and human-readable table format.
 //
+// Supported formats:
+//
+//   - "text"  – plain text, one entry per line
+//   - "json"  – newline-delimited JSON (NDJSON), one JSON object per line
+//   - "table" – human-readable table with aligned columns
+//
 // Usage:
 //
 //	f, err := output.ParseFormat("json")
