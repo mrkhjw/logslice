@@ -35,16 +35,16 @@ func Run(r io.Reader, w io.Writer, opts Options) (Result, error) {
 	p := parser.New(r)
 	entries, err := p.Parse()
 	if err != nil {
-		return Result{}, err
+		return Result{}, fmt.Errorf("pipeline: parsing failed: %w", err)
 	}
 
 	filtered := filter.Filter(entries, opts.Filter)
 	sampled := sampler.New(opts.Sampler).Apply(filtered)
 	deduped := dedup.Dedup(sampled, opts.Dedup)
 
-	fmt := output.New(opts.Format, opts.Color)
-	if err := fmt.Write(w, deduped); err != nil {
-		return Result{}, err
+	fmtr := output.New(opts.Format, opts.Color)
+	if err := fmtr.Write(w, deduped); err != nil {
+		return Result{}, fmt.Errorf("pipeline: writing output failed: %w", err)
 	}
 
 	var summary stats.Summary
