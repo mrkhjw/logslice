@@ -77,3 +77,26 @@ func TestDefaultTheme_NonEmpty(t *testing.T) {
 		t.Error("DefaultTheme.Reset should not be empty")
 	}
 }
+
+func TestSetTheme_RestoresOnEnable(t *testing.T) {
+	// Verify that EnableColor restores the DefaultTheme, overwriting any
+	// previously applied custom theme.
+	custom := Theme{
+		Error: "[ERR]",
+		Warn:  "[WRN]",
+		Info:  "[INF]",
+		Debug: "[DBG]",
+		Fatal: "[FTL]",
+		Bold:  "[B]",
+		Reset: "[R]",
+	}
+	SetTheme(custom)
+	EnableColor()
+
+	if ActiveTheme.Error == "[ERR]" {
+		t.Error("expected EnableColor to restore default theme, but custom Error value persisted")
+	}
+	if ActiveTheme.Error != DefaultTheme.Error {
+		t.Errorf("expected ActiveTheme.Error=%q after EnableColor, got %q", DefaultTheme.Error, ActiveTheme.Error)
+	}
+}
