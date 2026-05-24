@@ -74,3 +74,26 @@ func TestApply_HighRate_AllowsMany(t *testing.T) {
 		t.Fatalf("expected 20 entries, got %d", len(out))
 	}
 }
+
+// TestApply_BurstRefill_AllowsAfterWait verifies that tokens are replenished
+// over time: after exhausting the burst, waiting one second should allow
+// additional entries through at the configured rate.
+func TestApply_BurstRefill_AllowsAfterWait(t *testing.T) {
+	const rate = 5
+	l := ratelimit.New(ratelimit.Options{PerSecond: rate, Burst: rate})
+
+	// Exhaust the initial burst.
+	first := l.Apply(makeEntries(rate))
+	if len(first) != rate {
+		t.Fatalf("expected %d entries in first batch, got %d", rate, len(first))
+	}
+
+	// Wait slightly over one second so the token bucket refills.
+	time.Sleep(1100 * time.Millisecond)
+
+	// After refill, at least one entry should be allowed through.
+	second := l.Apply(makeEntries(rate))
+	if len(second) == 0 {
+		t.Fatal("expected at least 1 entry after token refill, got 0")
+	}
+}
