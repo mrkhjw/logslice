@@ -39,12 +39,16 @@ func Apply(entries []parser.Entry, opts Options) []parser.Entry {
 }
 
 func applyRules(e parser.Entry, opts Options) parser.Entry {
+	copied := false
 	for _, rule := range opts.Rules {
 		val, src := firstNonEmpty(e, rule.Fields)
 		if val == "" {
 			continue
 		}
-		e = copyEntry(e)
+		if !copied {
+			e = copyEntry(e)
+			copied = true
+		}
 		e.Fields[rule.Target] = val
 		if opts.DropSources && src != rule.Target {
 			delete(e.Fields, src)
