@@ -30,6 +30,8 @@ func DefaultOptions() Options {
 }
 
 // Apply classifies each entry and returns an annotated copy.
+// Rules are evaluated in order; the first match wins. If no rule matches and
+// DefaultCategory is non-empty, that value is used instead.
 func Apply(entries []parser.Entry, opts Options) []parser.Entry {
 	if opts.OutputField == "" {
 		opts.OutputField = "category"
@@ -48,6 +50,17 @@ func Apply(entries []parser.Entry, opts Options) []parser.Entry {
 		out = append(out, e)
 	}
 	return out
+}
+
+// MustCompileRule is a convenience constructor that compiles pattern into a
+// Rule and panics if the pattern is not a valid regular expression. It is
+// intended for use in package-level variable initialisations and tests.
+func MustCompileRule(pattern, category, field string) Rule {
+	return Rule{
+		Pattern:  regexp.MustCompile(pattern),
+		Category: category,
+		Field:    field,
+	}
 }
 
 func matchRules(e parser.Entry, rules []Rule) string {
