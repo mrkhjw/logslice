@@ -62,3 +62,10 @@ func Apply(entries []parser.Entry, opts Options) [][]parser.Entry {
 
 	return batches
 }
+
+// Count returns the number of batches that Apply would produce for the given
+// entries and options, without allocating the batches themselves. This is
+// useful for pre-sizing downstream data structures or for metrics collection.
+func Count(entries []parser.Entry, opts Options) int {
+	return len(Apply(entries, opts))
+}
